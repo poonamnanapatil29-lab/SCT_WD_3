@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interactive Quiz Game</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2b2e4a, #1b1d2f 60%, #0f1020);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .app {
+      width: 90%;
+      max-width: 850px;
+      background: linear-gradient(145deg, #1e2140, #14162e);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .badge {
+      border: 2px solid #ff4d4d;
+      padding: 8px 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 36px;
+      letter-spacing: 1px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 25px;
+      margin-top: 20px;
+    }
+    .question {
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+    .options label {
+      display: block;
+      background: rgba(255,255,255,0.08);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .options label:hover { background: rgba(0,200,200,0.2); }
+    .options input { margin-right: 10px; }
+    input[type=text] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    button {
+      padding: 12px 26px;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(135deg, #00d2d3, #01a3a4);
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 6px 20px rgba(0,210,211,0.4);
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,210,211,0.6);
+    }
+    .result {
+      text-align: center;
+    }
+    .score {
+      font-size: 48px;
+      color: #00e6e6;
+      margin: 20px 0;
+    }
+    .restart {
+      background: linear-gradient(135deg, #ff9f43, #ff6f00);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="badge">TASK 03</div>
+      <h1>Quiz Game Application</h1>
+    </header>
+
+    <div id="quiz" class="card"></div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        type: 'single',
+        question: 'Which language is used to style web pages?',
+        options: ['HTML', 'CSS', 'Python', 'Java'],
+        answer: ['CSS']
+      },
+      {
+        type: 'multi',
+        question: 'Select all JavaScript frameworks:',
+        options: ['React', 'Angular', 'Django', 'Vue'],
+        answer: ['React', 'Angular', 'Vue']
+      },
+      {
+        type: 'fill',
+        question: 'Fill in the blank: ___ is used to add interactivity to websites.',
+        answer: ['JavaScript']
+      }
+    ];
+
+    let index = 0;
+    let score = 0;
+    const quiz = document.getElementById('quiz');
+
+    function renderQuestion() {
+      const q = quizData[index];
+      quiz.innerHTML = `<div class="question">${q.question}</div>`;
+      let html = '';
+
+      if (q.type === 'single' || q.type === 'multi') {
+        html += '<div class="options">';
+        q.options.forEach(opt => {
+          html += `<label><input type="${q.type === 'single' ? 'radio' : 'checkbox'}" name="opt" value="${opt}"> ${opt}</label>`;
+        });
+        html += '</div>';
+      } else {
+        html += `<input type="text" id="fillAnswer" placeholder="Type your answer here...">`;
+      }
+
+      html += `<div class="controls"><button onclick="next()">${index === quizData.length - 1 ? 'Finish' : 'Next'}</button></div>`;
+      quiz.innerHTML += html;
+    }
+
+    function next() {
+      const q = quizData[index];
+      let userAns = [];
+
+      if (q.type === 'single' || q.type === 'multi') {
+        document.querySelectorAll('input[name=opt]:checked').forEach(i => userAns.push(i.value));
+      } else {
+        const val = document.getElementById('fillAnswer').value.trim();
+        if (val) userAns.push(val);
+      }
+
+      if (JSON.stringify(userAns.sort()) === JSON.stringify(q.answer.sort())) {
+        score++;
+      }
+
+      index++;
+      if (index < quizData.length) renderQuestion();
+      else showResult();
+    }
+
+    function showResult() {
+      quiz.innerHTML = `
+        <div class="result">
+          <h2>Quiz Completed 🎉</h2>
+          <div class="score">${score} / ${quizData.length}</div>
+          <p>You answered ${score} questions correctly.</p>
+          <button class="restart" onclick="location.reload()">Restart Quiz</button>
+        </div>`;
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>
